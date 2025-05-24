@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Pulse - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: #f0f2f5;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            color: #333;
+        }
+        
+        /* Navbar styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        
+        .navbar:hover {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px) saturate(110%);
+            -webkit-backdrop-filter: blur(12px) saturate(110%);
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            color: #0a3d62;
+            margin: 0;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-link {
+            color: #0a3d62;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            padding: 5px 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .nav-link:hover {
+            color: #4a69bd;
+            transform: translateY(-2px);
+        }
+        
+        .nav-link.active {
+            color: #4a69bd;
+            background: rgba(74, 105, 189, 0.08);
+            box-shadow: 0 1px 8px rgba(74, 105, 189, 0.1);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .username {
+            font-weight: 600;
+            color: #4a69bd;
+        }
+        
+        .logout-btn {
+            background: linear-gradient(45deg, #0a3d62, #4a69bd);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: linear-gradient(45deg, #0c2461, #1e3799);
+            box-shadow: 0 5px 15px rgba(26, 83, 181, 0.4);
+        }
+        
+        /* Dashboard container */
+        .dashboard-container {
+            padding-top: 90px;
+            padding-bottom: 40px;
+            margin: 0 auto;
+            height: calc(100vh - 90px);
+        }
+        
+        .dashboard-content {
+            height: 100%;
+            width: 100%;
+        }
+        
+        iframe {
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+            }
+            
+            .nav-links {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                margin-top: 10px;
+                gap: 15px;
+            }
+            
+            .logo h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <h1>Property Pulse</h1>
+        </div>
+        <div class="nav-links">
+            <a href="#" class="nav-link active">Dashboard</a>
+        </div>
+        <div class="user-info">
+            <span class="username" id="userDisplayName">Welcome, User</span>
+            <button class="logout-btn" id="logoutBtn">Logout</button>
+        </div>
+    </nav>
+    
+    <div class="dashboard-container">
+        <div class="dashboard-content">
+            <iframe src="https://us1.ca.analytics.ibm.com/bi/?perspective=dashboard&amp;pathRef=.my_folders%2FProperty%2BPulse%2BDashboard&amp;closeWindowOnLastView=true&amp;ui_appbar=false&amp;ui_navbar=false&amp;shareMode=embedded&amp;action=view&amp;mode=dashboard&amp;subView=model00000196a673fb5b_00000000" width="320" height="200" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen=""></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            // If no user is logged in, redirect to login page
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Display user name
+            document.getElementById('userDisplayName').textContent = `Welcome, ${currentUser.name}`;
+            
+            // Logout functionality
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                // Clear the session storage
+                sessionStorage.removeItem('currentUser');
+                
+                // Redirect to login page
+                window.location.href = 'login.html';
+            });
+        });
+    </script>
+</body>
+</html>

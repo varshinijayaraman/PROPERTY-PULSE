@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Pulse - Real Estate Analytics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            color: #333;
+            scroll-behavior: smooth;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Blurred content style */
+        .blurred-content {
+            filter: blur(0px);
+            user-select: none;
+        }
+        
+        /* Enhanced Navbar styles with better transitions */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .navbar-brand {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0a3d62;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+        }
+        
+        .navbar-brand:hover {
+            transform: scale(1.05);
+            text-shadow: 0 0 10px rgba(10, 61, 98, 0.2);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-link {
+            color: #0a3d62;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            padding: 8px 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: #4a69bd;
+            left: 0;
+            bottom: 0;
+            transition: width 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        
+        .nav-link:before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 120%;
+            height: 0;
+            transform: translate(-50%, -50%) rotate(45deg);
+            background: rgba(74, 105, 189, 0.08);
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: -1;
+        }
+        
+        .nav-link:hover {
+            color: #4a69bd;
+            transform: translateY(-2px);
+        }
+        
+        .nav-link:hover:before {
+            height: 300%;
+        }
+        
+        .nav-link:hover:after,
+        .nav-link.active:after {
+            width: 100%;
+        }
+        
+        .nav-link.active {
+            color: #4a69bd;
+            background: rgba(74, 105, 189, 0.08);
+            box-shadow: 0 1px 8px rgba(74, 105, 189, 0.1);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-btn {
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        
+        .login-btn {
+            background: transparent;
+            color: #0a3d62;
+            border: 1px solid #0a3d62;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .login-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 61, 98, 0.1);
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: -1;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .login-btn:hover:before {
+            left: 0;
+        }
+        
+        .register-btn {
+            background: linear-gradient(45deg, #0a3d62, #4a69bd);
+            color: white;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .register-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #0c2461, #1e3799);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: -1;
+        }
+        
+        .register-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(26, 83, 181, 0.4);
+        }
+        
+        .register-btn:hover:before {
+            opacity: 1;
+        }
+        
+        /* Parallax wrapper and items */
+        .parallax-wrapper {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            top: 0;
+            left: 0;
+            perspective: 1500px;
+            z-index: -1;
+        }
+        
+        .parallax-item {
+            position: absolute;
+            transform-style: preserve-3d;
+            transform: translate(-50%, -50%);
+            will-change: transform;
+            pointer-events: none;
+        }
+        
+        .parallax-item img {
+            display: block;
+            width: 100%;
+        }
+        
+        /* Animations for elements */
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(0deg) scale(1);
+            }
+            33% {
+                transform: translateY(-15px) rotate(5deg) scale(1.05);
+            }
+            66% {
+                transform: translateY(10px) rotate(-3deg) scale(0.95);
+            }
+            100% {
+                transform: translateY(0px) rotate(0deg) scale(1);
+            }
+        }
+        
+        @keyframes float-reverse {
+            0% {
+                transform: translateY(0px) rotate(0deg) scale(1);
+            }
+            33% {
+                transform: translateY(15px) rotate(-5deg) scale(0.95);
+            }
+            66% {
+                transform: translateY(-10px) rotate(3deg) scale(1.05);
+            }
+            100% {
+                transform: translateY(0px) rotate(0deg) scale(1);
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* Apply animations to elements */
+        .parallax-item.element-1 img {
+            animation: float 12s ease-in-out infinite;
+        }
+        
+        .parallax-item.element-2 img {
+            animation: float-reverse 10s ease-in-out infinite;
+            animation-delay: 0.5s;
+        }
+        
+        .parallax-item.element-3 img {
+            animation: float 8s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+        
+        .parallax-item.element-4 img {
+            animation: float-reverse 14s ease-in-out infinite;
+            animation-delay: 1.5s;
+        }
+        
+        .parallax-item.element-5 img {
+            animation: float 9s ease-in-out infinite;
+            animation-delay: 2s;
+        }
+        
+        .parallax-item.element-6 img {
+            animation: pulse 15s ease-in-out infinite;
+        }
+        
+        .parallax-item.element-7 img {
+            animation: float-reverse 13s ease-in-out infinite;
+            animation-delay: 1.2s;
+        }
+        
+        .parallax-item.element-8 img {
+            animation: float 11s ease-in-out infinite;
+            animation-delay: 0.7s;
+        }
+        
+        .parallax-item.element-9 img {
+            animation: float-reverse 15s ease-in-out infinite;
+            animation-delay: 0.3s;
+        }
+        
+        .parallax-item.element-10 img {
+            animation: float 10s ease-in-out infinite;
+            animation-delay: 2.5s;
+        }
+        
+        .parallax-item.element-11 img {
+            animation: pulse 12s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+        
+        .parallax-item.element-12 img {
+            animation: float 8.5s ease-in-out infinite;
+            animation-delay: 0.2s;
+        }
+        
+        .parallax-item.element-13 img {
+            animation: float-reverse 14s ease-in-out infinite;
+            animation-delay: 1.7s;
+        }
+        
+        /* Position and size for elements */
+        .parallax-item.element-bg {
+            width: 100%;
+            height: 100%;
+            top: 50%;
+            left: 50%;
+            z-index: -15;
+        }
+        .parallax-item.element-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .parallax-item.element-1 {
+            width: 180px;
+            top: 15%;
+            left: 20%;
+            z-index: -2;
+        }
+        .parallax-item.element-2 {
+            width: 150px;
+            top: 75%;
+            left: 85%;
+            z-index: -3;
+        }
+        .parallax-item.element-3 {
+            width: 120px;
+            top: 65%;
+            left: 25%;
+            z-index: -4;
+        }
+        .parallax-item.element-4 {
+            width: 170px;
+            top: 25%;
+            left: 80%;
+            z-index: -5;
+        }
+        .parallax-item.element-5 {
+            width: 140px;
+            top: 45%;
+            left: 15%;
+            z-index: -6;
+        }
+        .parallax-item.element-6 {
+            width: 200px;
+            top: 85%;
+            left: 55%;
+            z-index: -7;
+        }
+        .parallax-item.element-7 {
+            width: 130px;
+            top: 20%;
+            left: 45%;
+            z-index: -8;
+        }
+        .parallax-item.element-8 {
+            width: 160px;
+            top: 60%;
+            left: 90%;
+            z-index: -2;
+        }
+        .parallax-item.element-9 {
+            width: 150px;
+            top: 70%;
+            left: 40%;
+            z-index: -3;
+        }
+        .parallax-item.element-10 {
+            width: 120px;
+            top: 30%;
+            left: 65%;
+            z-index: -4;
+        }
+        .parallax-item.element-11 {
+            width: 180px;
+            top: 50%;
+            left: 75%;
+            z-index: -5;
+        }
+        .parallax-item.element-12 {
+            width: 140px;
+            top: 40%;
+            left: 30%;
+            z-index: -6;
+        }
+        .parallax-item.element-13 {
+            width: 160px;
+            top: 10%;
+            left: 10%;
+            z-index: -7;
+        }
+
+        /* Main content styles with improved transitions */
+        .main-container {
+            background-color: rgba(255, 255, 255, 0.381);
+            backdrop-filter: blur(5px);
+            max-width: 900px;
+            margin: 120px auto 40px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+            transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                        box-shadow 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        
+        .main-container:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h1 {
+            font-size: 48px;
+            color: #0a3d62;
+            margin-bottom: 15px;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1:after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, #0a3d62, #4a69bd);
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .tagline {
+            font-size: 20px;
+            color: #555;
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+          .content-section {
+            margin-bottom: 60px;
+            animation: fadeIn 0.8s ease-out forwards;
+            animation-delay: 0.2s;
+            opacity: 0;
+            padding-top: 80px;  /* Added to create space for navbar */
+            margin-top: -80px;  /* Offset the padding to maintain visual spacing */
+            scroll-margin-top: 80px; /* Modern browsers support this property */
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        h2 {
+            font-size: 32px;
+            color: #0a3d62;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        h2:after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(to right, #0a3d62, #4a69bd);
+            bottom: 0;
+            left: 0;
+        }
+        
+        p {
+            font-size: 17px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            color: #444;
+        }
+          /* Enhanced features section */
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+            margin: 60px 0;
+            animation: fadeIn 0.8s ease-out forwards;
+            animation-delay: 0.4s;
+            opacity: 0;
+            padding-top: 80px;  /* Added for navbar height */
+            margin-top: -80px;  /* Offset padding */
+            scroll-margin-top: 80px; /* For modern browsers */
+        }
+        
+        .feature-box {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 35px 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            flex: 1 1 260px;
+            max-width: 310px;
+            text-align: center;
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .feature-box:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 0;
+            background: linear-gradient(180deg, rgba(74, 105, 189, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+            transition: height 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: -1;
+        }
+        
+        .feature-box:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-box:hover:before {
+            height: 100%;
+        }
+        
+        .feature-box h3 {
+            color: #0a3d62;
+            margin-bottom: 15px;
+            font-size: 22px;
+            position: relative;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        
+        .feature-box h3:after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 2px;
+            background: #4a69bd;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: width 0.3s ease;
+        }
+        
+        .feature-box:hover h3:after {
+            width: 50px;
+        }
+        
+        .feature-icon {
+            font-size: 50px;
+            color: #4a69bd;
+            margin-bottom: 25px;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .feature-box:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        /* Improved team section */
+        .team-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 35px;
+            margin: 50px 0;
+            animation: fadeIn 0.8s ease-out forwards;
+            animation-delay: 0.6s;
+            opacity: 0;
+        }
+        
+        .team-member {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 35px 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            flex: 1 1 250px;
+            max-width: 300px;
+            text-align: center;
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .team-member:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 0;
+            background: linear-gradient(180deg, rgba(74, 105, 189, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+            transition: height 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: -1;
+        }
+        
+        .team-member:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(10, 61, 98, 0.1);
+        }
+        
+        .team-member:hover:before {
+            height: 100%;
+        }
+          .team-role {
+            color: #4a69bd;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 14px;
+            letter-spacing: 0.5px;
+        }
+        
+        .team-member h3 {
+            color: #0a3d62;
+            margin-bottom: 8px;
+            font-size: 20px;
+            position: relative;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        
+        .team-member h3:after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 2px;
+            background: #4a69bd;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: width 0.3s ease;
+        }
+        
+        .team-member:hover h3:after {
+            width: 50px;
+        }
+        
+        .team-role {
+            color: #4a69bd;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .team-desc {
+            color: #555;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+        
+        /* Improved CTA buttons */
+        .cta-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 60px;
+            animation: fadeIn 0.8s ease-out forwards;
+            animation-delay: 0.8s;
+            opacity: 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 16px 36px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 17px;
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #0a3d62, #4a69bd);
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #0c2461, #1e3799);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: -1;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(26, 83, 181, 0.4);
+        }
+        
+        .btn-primary:hover:before {
+            opacity: 1;
+        }
+        
+        .btn-outline {
+            border: 2px solid #0a3d62;
+            color: #0a3d62;
+            background: transparent;
+        }
+        
+        .btn-outline:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #0a3d62;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: -1;
+        }
+        
+        .btn-outline:hover {
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(10, 61, 98, 0.2);
+        }
+        
+        .btn-outline:hover:before {
+            left: 0;
+        }
+        
+        /* Improved footer and contact section */
+        .footer {
+            text-align: center;
+            margin-top: 70px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            color: #666;
+            font-size: 15px;
+            animation: fadeIn 0.8s ease-out forwards;
+            animation-delay: 1s;
+            opacity: 0;
+        }
+        
+        .footer a {
+            color: #4a69bd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer a:hover {
+            color: #0a3d62;
+            text-decoration: underline;
+        }
+        
+        #contact {
+            background: rgba(255, 255, 255, 0.8);
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: fadeIn 0.8s ease-out forwards;
+            animation-delay: 0.3s;
+            opacity: 0;
+        }
+        
+        #contact h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        #contact h2:after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        #contact a {
+            color: #4a69bd;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        #contact a:hover {
+            color: #0a3d62;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="parallax-wrapper">
+    <div class="parallax-item element-bg" data-speedx="0.01" data-speedy="0.01" data-speedz="0" data-rotation="0">
+        <img src="PP-BG.gif" alt="Background" />
+    </div>
+    <div class="parallax-item element-1" data-speedx="-0.03" data-speedy="0.02" data-speedz="0.5" data-rotation="0.8">
+        <img src="PP-ELEMENTS (1).png" alt="Element 1" />
+    </div>
+    <div class="parallax-item element-2" data-speedx="0.04" data-speedy="-0.02" data-speedz="1" data-rotation="-0.5">
+        <img src="PP-ELEMENTS (2).png" alt="Element 2" />
+    </div>
+    <div class="parallax-item element-3" data-speedx="-0.02" data-speedy="0.04" data-speedz="1.5" data-rotation="1">
+        <img src="PP-ELEMENTS (3).png" alt="Element 3" />
+    </div>
+    <div class="parallax-item element-4" data-speedx="0.05" data-speedy="0.01" data-speedz="0.8" data-rotation="-0.7">
+        <img src="PP-ELEMENTS (4).png" alt="Element 4" />
+    </div>
+    <div class="parallax-item element-5" data-speedx="-0.04" data-speedy="-0.03" data-speedz="1.2" data-rotation="0.6">
+        <img src="PP-ELEMENTS (5).png" alt="Element 5" />
+    </div>
+    <div class="parallax-item element-6" data-speedx="0.03" data-speedy="0.05" data-speedz="0.7" data-rotation="-0.3">
+        <img src="PP-ELEMENTS (6).png" alt="Element 6" />
+    </div>
+    <div class="parallax-item element-7" data-speedx="-0.05" data-speedy="-0.01" data-speedz="1.1" data-rotation="0.4">
+        <img src="PP-ELEMENTS (7).png" alt="Element 7" />
+    </div>
+    <div class="parallax-item element-8" data-speedx="0.02" data-speedy="-0.04" data-speedz="0.9" data-rotation="-0.9">
+        <img src="PP-ELEMENTS (8).png" alt="Element 8" />
+    </div>
+    <div class="parallax-item element-9" data-speedx="-0.01" data-speedy="0.03" data-speedz="1.3" data-rotation="0.2">
+        <img src="PP-ELEMENTS (9).png" alt="Element 9" />
+    </div>
+    <div class="parallax-item element-10" data-speedx="0.04" data-speedy="-0.03" data-speedz="1.4" data-rotation="0.5">
+        <img src="PP-ELEMENTS (10).png" alt="Element 10" />
+    </div>
+    <div class="parallax-item element-11" data-speedx="-0.03" data-speedy="0.01" data-speedz="0.6" data-rotation="-0.4">
+        <img src="PP-ELEMENTS (11).png" alt="Element 11" />
+    </div>
+    <div class="parallax-item element-12" data-speedx="0.01" data-speedy="-0.05" data-speedz="1.2" data-rotation="0.7">
+        <img src="PP-ELEMENTS (12).png" alt="Element 12" />
+    </div>
+    <div class="parallax-item element-13" data-speedx="-0.02" data-speedy="0.03" data-speedz="0.5" data-rotation="-0.6">
+        <img src="PP-ELEMENTS (13).png" alt="Element 13" />
+    </div>
+</div>
+
+<nav class="navbar">
+    <a href="#" class="navbar-brand">Property Pulse</a>
+    <div class="nav-links">
+        <a href="#home" class="nav-link">Home</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#team" class="nav-link">Team</a>
+        <a href="#contact" class="nav-link">Contact Us</a>
+    </div>
+    <div class="nav-buttons">
+        <a href="login.html" class="nav-btn login-btn">Login</a>
+        <a href="register.html" class="nav-btn register-btn">Register</a>
+    </div>
+</nav>
+
+<div class="main-container" id="home">
+    <div class="header">
+        <h1>Welcome to Property Pulse</h1>
+        <div class="tagline">Your Gateway to Real Estate Insights</div>
+    </div>
+
+    <div class="content-section blurred-content">
+        <h2>Problem Statement</h2>
+        <p>Real estate investors and analysts face challenges in tracking market trends due to scattered and complex data. This often leads to missed opportunities and uninformed decisions.</p>
+        
+        <h2>Our Solution</h2>
+        <p>Property Pulse simplifies real estate analytics by providing an interactive dashboard with key metrics like pricing trends, rental yields, and growth patterns. Empowering users to make data-driven decisions with ease.</p>
+    </div>
+
+    <div class="features" id="features">
+        <div class="feature-box">
+            <div class="feature-icon">📊</div>
+            <h3>Visual Market Trends</h3>
+            <p>Explore interactive charts showcasing real estate trends across regions.</p>
+        </div>
+        <div class="feature-box">
+            <div class="feature-icon">🔍</div>
+            <h3>Transaction Analysis</h3>
+            <p>Gain insights into transaction values, land prices, and property usage.</p>
+        </div>
+        <div class="feature-box">
+            <div class="feature-icon">📈</div>
+            <h3>Growth Tracking</h3>
+            <p>Monitor growth opportunities and rental yields with detailed analytics.</p>
+        </div>
+    </div>
+
+    <div class="content-section" id="about">
+        <h2>About Property Pulse</h2>
+        <p>At Property Pulse, we aim to revolutionize real estate analytics by making complex data accessible and actionable. Our platform empowers users with insights to make informed investment decisions.</p>
+        <p>With cutting-edge technology and user-friendly tools, we bring clarity to market trends, helping you stay ahead in the dynamic real estate landscape.</p>
+    </div>    <div class="content-section" id="team">
+        <h2>Meet Our Team</h2>
+        <div class="team-container">
+            <div class="team-member">
+                <h3>Prasanth S</h3>
+                <p class="team-role">Data Engineer</p>
+                <p>Led the dataset acquisition, integration, and preprocessing phases of the project. Developed robust backend systems for data storage, retrieval, and API integration with analytics services.</p>
+                <p><strong>Contributions:</strong> Dataset curation, ETL pipeline architecture, data preprocessing algorithms, backend infrastructure</p>
+            </div>
+            <div class="team-member">
+                <h3>Saravana Priyan S T</h3>
+                <p class="team-role">Frontend Developer</p>
+                <p>Designed and implemented the responsive user interface with focus on accessibility and user experience. Created interactive dashboard elements that effectively visualize complex property market data.</p>
+                <p><strong>Contributions:</strong> UI/UX design, frontend architecture, dashboard visualization implementation, responsive design</p>
+            </div>
+            <div class="team-member">
+                <h3>Varshini J</h3>
+                <p class="team-role">Project Manager & Data Analyst</p>
+                <p>Orchestrated the project planning and execution while leading the analytical framework development. Created insightful dashboards that transform raw property data into actionable market intelligence.</p>
+                <p><strong>Contributions:</strong> Project planning, dashboard architecture, analytical models, strategic direction</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="cta-buttons">
+        <a href="login.html" class="btn btn-primary">Log In</a>
+        <a href="register.html" class="btn btn-outline">Register</a>
+    </div>
+
+    <div class="footer">
+        <p>© 2025 Property Pulse. All rights reserved. | <a href="#contact">Contact Us</a></p>
+    </div>
+</div>
+
+<div id="contact" class="content-section">
+    <h2>Contact Us</h2>
+    <p>Have questions or need assistance? Reach out to us at <a href="mailto:support@propertypulse.com">support@propertypulse.com</a>.</p>
+</div>
+
+<script>
+    // Parallax effect
+    const parallaxItems = document.querySelectorAll('.parallax-item');
+    document.addEventListener('mousemove', e => {
+        let xValue = e.clientX - window.innerWidth / 2;
+        let yValue = e.clientY - window.innerHeight / 2;
+
+        parallaxItems.forEach(el => {
+            let speedx = parseFloat(el.dataset.speedx);
+            let speedy = parseFloat(el.dataset.speedy);
+            let speedz = parseFloat(el.dataset.speedz);
+            let rotation = parseFloat(el.dataset.rotation);
+            
+            let isInLeft = parseFloat(getComputedStyle(el).left) < window.innerWidth / 2 ? 1 : -1;
+            let zValue = (e.clientX - parseFloat(getComputedStyle(el).left)) * isInLeft * 0.1;
+
+            el.style.transform = `
+                perspective(1500px)
+                translateZ(${zValue * speedz}px)
+                rotateY(${xValue * rotation * 0.01}deg)
+                translateX(calc(-50% + ${-xValue * speedx}px))
+                translateY(calc(-50% + ${-yValue * speedy}px))
+            `;
+        });
+          // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+        const navbar = document.querySelector('.navbar');
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+        
+        // Update the active nav link based on scroll position
+        const sections = document.querySelectorAll('.content-section, #features, #home');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const navbarHeight = navbar.offsetHeight;
+        
+        let current = '';
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - navbarHeight - 100;
+            const sectionHeight = section.offsetHeight;
+            if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) {
+                link.classList.add('active');
+            }
+        });
+    });
+    });    // Store user data
+    const users = [
+        { email: "user@example.com", password: "password123", name: "Demo User" },
+        { email: "admin@propertypulse.com", password: "admin123", name: "Admin" }
+    ];
+    
+    // Save to localStorage for testing purposes
+    localStorage.setItem('users', JSON.stringify(users));
+      // Smooth scrolling for navigation links with navbar height offset
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                // Get navbar height to use as offset
+                const navbar = document.querySelector('.navbar');
+                const navbarHeight = navbar.offsetHeight;
+                
+                // Calculate the scroll position
+                const elementPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - navbarHeight - 20; // Added extra 20px for spacing
+                
+                // Scroll to the adjusted position
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>
